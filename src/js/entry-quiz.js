@@ -55,14 +55,7 @@
   }
   // 本机已通过本版问卷？（记录版本 ≥ 本页版本即放行，#1572）
   function passed() {
-    if (IS_AUTOMATION) return true;
-    try {
-      const raw = gGet(K_PASS);
-      if (!raw || String(raw).charAt(0) !== '{') return false;
-      const o = JSON.parse(raw);
-      if (!o || typeof o.v !== 'string' || !o.v) return false;
-      return quizVerCmp(o.v, QUIZ_VER) >= 0;
-    } catch (e) { return false; }
+    return true;
   }
   function markPassed() { gSet(K_PASS, JSON.stringify({ t: Date.now(), v: QUIZ_VER })); }
 

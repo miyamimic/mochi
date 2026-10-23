@@ -2,7 +2,10 @@
   "name": "mochi",
   "private": true,
   "scripts": {
-    "build": "node build.mjs",
+    "dev": "node server.mjs",
+    "start": "node server.mjs",
+    "build": "node build.mjs --allow-revert",
+    "lint": "node build.mjs --check-sentinels",
     "check:revert": "node tools/verify-worktree-revert.mjs",
     "verify": "node tools/verify.mjs",
     "verify:webkit": "node tools/verify-webkit.mjs",

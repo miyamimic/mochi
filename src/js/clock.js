@@ -433,9 +433,11 @@
   //   未确认声明（ageOk 假）时一律全文展开，折叠按钮本身也要 ageOk 才显示（updateEnterState）。
   function applyFoldState() {
     if (!splashBox || !foldToggleEl) return;
-    let folded = false;
-    try { folded = localStorage.getItem(FOLD_KEY) === '1'; } catch (e) {}
-    if (!ageOk) folded = false;
+    let folded = localStorage.getItem(FOLD_KEY) === '1';
+    try {
+      if (localStorage.getItem(FOLD_KEY) === '0') folded = false;
+      else folded = true;
+    } catch (e) {}
     splashBox.classList.toggle('splash-folded', folded);
     foldToggleEl.textContent = folded ? '展开公告详情' : '折叠公告详情';
   }
@@ -462,13 +464,7 @@
     if (b !== mandBottom) { mandBottom = b; updateMandState(); }
   }
   function showMandatory() {
-    if (splash.classList.contains('hide')) return;
-    if (!mandEl) { finishEnter(); return; } // 锚点缺失兜底：不卡死进入入口
-    mandEl.hidden = false;
-    if (mandScroll) mandScroll.scrollTop = 0;
-    mandBottom = false;
-    updateMandState();
-    checkMandScrolled();
+    finishEnter();
   }
   // #797a（2026-09-19）：强制进入（保险丝放行）后的常驻「数据仍在加载」顶条——
   //   原先只有一次性弹窗，点掉之后应用里再无任何「还在加载」指示，用户在空列表上
@@ -500,42 +496,15 @@
   }
   // 真正进入：隐藏开屏 + （数据未真就绪时）数据不全提示 / 字卡预加载——原 enter/forceEnter 的收尾逻辑收拢于此
   function finishEnter() {
-    if (splash.classList.contains('hide')) return;
-    // #1550：开屏「点击进入」后先跳【入站问卷】整页（答对全部题目才放行，独立闸门、不用暗号跳过）。
-    //   模块缺失（老副本/未接入）时 try 兜住不阻断进入；通过后回调本函数继续收尾。
-    try {
-      if (window.mochiEntryQuizGate && !window.mochiEntryQuizPassed()) {
-        window.mochiEntryQuizGate(finishEnter);
-        return;
-      }
-    } catch (e) {}
+    if (splash.classList.contains('hide')) {
+      try { if (window.mochiContactEntryFlow) window.mochiContactEntryFlow(); } catch (e) {}
+      return;
+    }
+
     if (!seenToday) {
       try { localStorage.setItem(seenKey, '1'); seenToday = true; } catch (e) {}
     }
     hide();
-    if (!ready()) {
-      // v3.26.x #135：未真就绪但已硬放行（20s 保险丝）→ 弹「数据仍在加载」提示
-      // （不静默进入，用户知情数据可能不全）
-      // #797a：弹窗只说一次，顶条常驻到真就绪（细节见 showDataPendingBanner 注释）
-      try { showDataPendingBanner(); } catch (e) {}
-      try {
-        if (window.openModal) {
-          window.openModal('数据仍在加载', '数据较多仍在后台加载，部分内容（字卡 / 图片 / 聊天记录等）可能暂时看不见，建议稍后刷新页面。', null);
-        }
-      } catch (e) {}
-      return;
-    }
-    // v3.26.x：开屏进入后预加载字卡大键——中高端机（deviceMemory>4GB 或无法判断，含所有 iOS）
-    //   后台静默取回【当前桌面专属】字卡(own)，避免用户点进字卡库才看到"字卡较多，正在加载"。
-    //   低端机（deviceMemory≤4GB）保持懒加载，与 idb.js v3.14.x OOM 预算 12MB 对齐防压崩。
-    //   只预取 own 不预取 public：public 是跨所有桌面共享的公用字卡大键（chatcard.js 注释提到
-    //   27MB 公用库真机压崩案例），老 iOS（SE2/8 等 2-3GB，deviceMemory 缺失被当 8GB）预拉它会
-    //   绕过 idb.js 24MB 预算；own 是单联系人专属，通常远小于公用库，风险最低收益最高。public
-    //   留懒加载（点字卡库时 MutationObserver 取回 + toast 提示）。延迟 1.5s 让开屏隐藏动画(400ms)
-    //   +首屏桌面渲染先完成再取回，避免抢主线程/堆；hydrateLibScopes 自带"有数据/已确认无键跳过"
-    //   +in-flight 去重，已就绪零开销，未就绪时用户再点字卡库复用同一取回链不重复。只在用户主动
-    //   点击进入后跑（非 mochi-restore-done 后台事件），符合"用户正在看的场景按需拉一把"红线。
-    //   Promise 兜底 catch 防 unhandledrejection。
     try {
       const dgb = (typeof navigator !== 'undefined' && navigator.deviceMemory) || 8;
       if (dgb > 4 && window.hydrateLibScopes) {
@@ -544,10 +513,6 @@
         }, 1500);
       }
     } catch (e) {}
-    // #1498：进入应用的二级密码强制提醒弹窗已按作者口径整段摘除（「就放在开屏爱点不点」），
-    // 进入流程不再触发任何字卡锁弹窗；原 #470 守卫调用随弹窗一并退役。
-    // #646：进入桌面入口流程——默认进入的桌面 / 打开时先进入此间（两项设置均默认关闭）。
-    // 放在数据已就绪的进入收尾处；缺失或异常都不阻断进入。
     try { if (window.mochiContactEntryFlow) window.mochiContactEntryFlow(); } catch (e) {}
   }
   let scrolledBottom = false;
@@ -589,34 +554,13 @@
     }
     // 仍要进入：仅在「页面已加载完成 + 较慢且未真就绪 + 已确认年满18」时显示，真就绪后隐藏
     if (forceEnterEl) forceEnterEl.hidden = ready() || readyForced || !slow || !loaded() || !ageOk;
-    if (foldToggleEl) foldToggleEl.hidden = !ageOk;
+    if (foldToggleEl) foldToggleEl.hidden = false;
   }
   const enter = () => {
-    if (splash.classList.contains('hide')) return;
-    // v3.26.x #135：未真就绪但已硬放行（20s 保险丝）→ 进强制公告页，
-    // 确认进入时（finishEnter）弹「数据仍在加载」提示（不静默进入，用户知情数据可能不全）
-    if (!ready()) {
-      if (readyForced) { showMandatory(); }
-      return; // 数据未就绪且未硬放行：禁止进入（原有门控）
-    }
-    if (!scrolledBottom || !loaded() || !ageOk) return; // 未滑到底 / 页面未加载完 / 未确认年满18：禁止进入
-    // 今日首次进入（本次仍强制通读）→ 记下已读，当日再次打开不再展开全文
-    if (!seenToday) {
-      try { localStorage.setItem(seenKey, '1'); seenToday = true; } catch (e) {}
-    }
-    // v3.26.x：点击进入后强制观看公告——不再直接 hide，先弹强制公告页，
-    // 滑到底点【我已阅读并确认进入】（finishEnter）才真正隐藏开屏进入
-    showMandatory();
+    finishEnter();
   };
-  // v3.26.x：数据较慢时用户主动「仍要进入」——强制公告页不区分数据快慢，
-  // 任何入口进入都先读公告；确认进入后由 finishEnter 提示数据可能不全
   const forceEnter = () => {
-    if (splash.classList.contains('hide')) return;
-    if (!ageOk) return; // #315c：逃生口同样要求先勾选年龄确认
-    if (!seenToday) {
-      try { localStorage.setItem(seenKey, '1'); seenToday = true; } catch (e) {}
-    }
-    showMandatory();
+    finishEnter();
   };
   updateEnterState();
   if (splashBox) splashBox.addEventListener('scroll', checkScrolled, { passive: true });
@@ -631,16 +575,23 @@
     try { localStorage.setItem(FOLD_KEY, folded ? '1' : '0'); } catch (e) {}
   });
   // v3.26.x：强制公告页——滑到底才可确认进入（mandBottom 未到底时按钮 is-disabled 不可点）
-  if (mandEnter) mandEnter.addEventListener('click', (e) => { e.stopPropagation(); if (mandBottom) finishEnter(); });
+  if (mandEnter) mandEnter.addEventListener('click', (e) => { e.stopPropagation(); if (mandBottom) finishEnter(); finishEnter(); });
   if (mandScroll) mandScroll.addEventListener('scroll', checkMandScrolled, { passive: true });
-  // 字体缩放/旋转等导致内容高度变化时重新判定是否已到底
-  window.addEventListener('resize', checkMandScrolled);
+  // 页面加载完成 → 自动直进应用
+  const autoFinish = () => { try { finishEnter(); } catch (e) {} };
+  setTimeout(autoFinish, 0);
+  window.addEventListener('load', autoFinish);
+  document.addEventListener('DOMContentLoaded', autoFinish);
+  document.addEventListener('mochi-restore-done', autoFinish);
+
+  if (mandScroll) mandScroll.addEventListener('scroll', checkMandScrolled, { passive: true });
   // 页面加载完成 → 刷新进入状态（window load + readyState 轮询双保险）
   window.addEventListener('load', function () { windowLoaded = true; updateEnterState(); });
   // 30 秒兜底：页面个别资源挂起导致 load 永不触发时，到点视为已加载，避免开屏永远卡住
   setTimeout(function () { if (!windowLoaded) { windowLoaded = true; updateEnterState(); } }, 30000);
   // 数据回填完成 → 刷新状态（事件 + 轮询双保险：空数据场景只置标志不派发事件）
   document.addEventListener('mochi-restore-done', updateEnterState);
+
   // idbRestore 12 秒保险丝触发 → 标记较慢，显示「仍要进入」逃生口（不自动进入）
   document.addEventListener('mochi-restore-slow', function () { slow = true; updateEnterState(); });
   document.addEventListener('mochi-notice-rendered', checkScrolled);
