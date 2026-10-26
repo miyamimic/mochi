@@ -10523,101 +10523,7 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
 .set-row .txt { font-size: calc(14px + var(--mochi-text-adj, 0px)); }
 .set-row .txt .sub { font-size: calc(11.5px + var(--mochi-text-adj, 0px)); }
 .gc-set-row .txt { font-size: calc(14px + var(--mochi-text-adj, 0px)); }
-.splash.eqz-active .splash-box,
-.splash.eqz-active .splash-footcard { display: none; }
-.eqz-page {
-flex: 1; min-height: 0; width: 100%; box-sizing: border-box;
-display: flex; flex-direction: column;
-text-align: left;
-}
-.eqz-head {
-padding: 0 0 12px;
-border-bottom: 1px solid var(--sp-line, rgba(0, 0, 0, .08));
-}
-.eqz-back {
-appearance: none; -webkit-appearance: none;
-display: inline-block; margin: 0 0 10px; padding: 3px 11px;
-font-size: 11.5px; font-weight: 700; line-height: 1.6; letter-spacing: 1px;
-color: var(--muted, #8a8a8a); background: none; cursor: pointer; touch-action: manipulation;
-border: 1px solid var(--card-border, rgba(0, 0, 0, .1)); border-radius: 999px;
-}
-.eqz-title { font-size: 15px; font-weight: 800; color: var(--ink, #111); letter-spacing: 1px; text-align: center; }
-.eqz-sub { margin-top: 8px; font-size: 11.5px; line-height: 1.75; color: var(--muted, #8a8a8a); white-space: normal; }
-.eqz-progress { margin-top: 10px; font-size: 11px; font-weight: 700; color: var(--sp-ink, #111); text-align: center; letter-spacing: 1px; }
-.eqz-view { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-.eqz-view[hidden] { display: none; }
-.eqz-view .eqz-scroll { flex: 1; }
-#eqz-view-result { overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-#eqz-view-result::-webkit-scrollbar { display: none; }
-.eqz-scroll {
-min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
-padding: 14px 18px 6px; scrollbar-width: none; -ms-overflow-style: none;
-}
-.eqz-scroll::-webkit-scrollbar { display: none; }
-.eqz-q { margin: 0 0 16px; }
-.eqz-qh { font-size: 12.5px; font-weight: 700; color: var(--ink, #111); line-height: 1.7; margin-bottom: 8px; }
-.eqz-idx { margin-right: 4px; }
-.eqz-tag {
-display: inline-block; margin-right: 6px; padding: 0 6px; border-radius: 6px;
-font-size: 10px; font-weight: 700; vertical-align: 1px;
-color: var(--soft-ink, #555); background: var(--static-bg, rgba(0, 0, 0, .06));
-}
-.eqz-opt {
-display: flex; gap: 8px; align-items: flex-start; width: 100%;
-padding: 9px 11px; margin-bottom: 6px;
-border: 1px solid var(--card-border, rgba(0, 0, 0, .1)); border-radius: 11px;
-background: var(--card-bg-97, transparent);
-font-size: 12.5px; line-height: 1.65; color: var(--soft-ink, #555);
-font-family: inherit; text-align: left; cursor: pointer; position: relative;
-appearance: none; -webkit-appearance: none; touch-action: manipulation;
--webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none;
-}
-.eqz-opt::before {
-content: ''; flex: 0 0 auto; width: 16px; height: 16px; margin: 2px 0 0; box-sizing: border-box;
-border: 1.5px solid var(--card-border, rgba(0, 0, 0, .25)); background: transparent;
-}
-.eqz-opt.eqz-check::before { border-radius: 4px; }
-.eqz-opt.eqz-radio::before { border-radius: 50%; }
-.eqz-opt.is-sel::before { border-color: var(--sp-ink, #111); }
-.eqz-opt.eqz-radio.is-sel::before {
-background: radial-gradient(circle, var(--sp-ink, #111) 0, var(--sp-ink, #111) 2.5px, transparent 3px);
-}
-.eqz-opt.eqz-check.is-sel::before { background: var(--sp-ink, #111); }
-.eqz-opt.eqz-check.is-sel::after {
-content: ''; position: absolute; left: 15px; top: 14px; width: 8px; height: 4px; box-sizing: border-box;
-border-left: 2px solid var(--btn-ink, #fff); border-bottom: 2px solid var(--btn-ink, #fff);
-transform: rotate(-45deg); transform-origin: center;
-}
-.eqz-opt-t { flex: 1; white-space: normal; word-break: break-word; }
-.eqz-opt.is-sel { border-color: var(--sp-ink, #111); background: var(--sp-soft, rgba(17, 17, 17, .055)); color: var(--ink, #111); }
-.eqz-foot {
-padding: 10px 18px calc(16px + env(safe-area-inset-bottom, 0px));
-border-top: 1px solid var(--sp-line, rgba(0, 0, 0, .08));
-}
-.eqz-note { margin-bottom: 8px; font-size: 11.5px; line-height: 1.6; color: var(--muted, #8a8a8a); white-space: normal; }
-.eqz-btn {
-width: 100%; padding: 12px; border: none; border-radius: 12px;
-background: var(--btn-bg, #111); color: var(--btn-ink, #fff);
-font-size: 15px; font-weight: 700; cursor: pointer; touch-action: manipulation;
-}
-.eqz-btn:active { transform: scale(.98); opacity: .9; }
-.eqz-btn-ghost {
-margin-top: 8px; background: none; color: var(--soft-ink, #555);
-border: 1px solid var(--card-border, rgba(0, 0, 0, .1));
-}
-.eqz-rs { padding: 20px 18px 8px; }
-.eqz-rs-t { font-size: 17px; font-weight: 800; margin: 0 0 12px; }
-.eqz-rs-ok .eqz-rs-t { color: var(--ok-ink, #1c7c3c); }
-.eqz-rs-bad .eqz-rs-t { color: var(--danger-ink, #a32d2d); }
-.eqz-rs-d { font-size: 12px; line-height: 1.7; color: var(--muted, #8a8a8a); margin: 0 0 12px; white-space: normal; }
-.eqz-rs-list { margin: 0 0 16px; }
-.eqz-rs-li {
-padding: 9px 12px; margin-bottom: 8px; font-size: 12.5px; line-height: 1.6;
-color: var(--soft-ink, #555);
-border: 1px solid var(--danger-ink, #a32d2d); border-radius: 11px;
-white-space: normal; word-break: break-word;
-}
-.eqz-rs-n { font-weight: 800; color: var(--danger-ink, #a32d2d); margin-right: 6px; }
+
 .ur-wrap {
 position: absolute; inset: 0; z-index: 30;
 display: flex; align-items: center; justify-content: center;
@@ -10657,8 +10563,8 @@ font-size: 11.5px; color: var(--muted, #8a8a8a); cursor: pointer; touch-action: 
 </head>
 <body>
   <!-- 开屏加载动画 -->
-  <div class="splash" id="splash">
-    <div class="splash-box" id="splash-box">
+  <div class="splash hide" id="splash">
+    <div class="splash-box splash-folded" id="splash-box">
       <!-- v8.29 #973（用户 2026-09-21 直派「开屏顶部最显眼还需要标红提醒」，并把文案改写定稿为：「网站本质只是工具，
            使用取决于个人，各种原因都需要适应和调整。网站内置内容非常非常多，不适用建议不使用这个网站，或给一定时间
            适应。回复设置概率。非常多功能的时间和概率，全部都是公开的可以自己调。一些功能也可以自己设置关闭。聊天字卡
@@ -11201,7 +11107,7 @@ font-size: 11.5px; color: var(--muted, #8a8a8a); cursor: pointer; touch-action: 
            （名称+版号 / 部署时间+实时秒 / 版本检测行）收成一行；检测行随 ver-check.js 退役删除。
            data-build-ts / data-version 两属性保留：device.js 诊断、bg-keep 自检、pwa.js 旧包检测
            仍只读属性（诊断版本号走 data-version 兜底，device.js 两处缓存原生支持）。 -->
-      <div class="splash-ver" id="splash-ver" data-build-ts="1792142148876" data-version="v8.67">
+      <div class="splash-ver" id="splash-ver" data-build-ts="1792989035636" data-version="v8.56">
         <span class="sv-app">Mochi 字卡传讯 已完结停更</span>
       </div>
       <!-- v3.5.120：数据（IndexedDB 回填）加载完成前不显示「点击进入」按钮，
@@ -12738,7 +12644,7 @@ font-size: 11.5px; color: var(--muted, #8a8a8a); cursor: pointer; touch-action: 
         <div class="set-row" id="row-changelog">
           <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 12c0-5.5 3.5-10 10-10 3.7 0 7 2 8.8 5M22 12c0 5.5-3.5 10-10 10-3.7 0-7-2-8.8-5"/></svg></div>
           <div class="txt">版本与更新<span class="sub">当前版本 · 一键更新到最新（更新摘要见开屏公告）</span></div>
-          <div class="val" id="about-ver-val">v8.67</div>
+          <div class="val" id="about-ver-val">v8.56</div>
           <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></div>
         </div>
         <!-- #606 开源与致谢：开源/私有部署说明 + 灵感来源与致谢（内容与功能介绍页同源，做成独立入口） -->
@@ -12830,7 +12736,7 @@ font-size: 11.5px; color: var(--muted, #8a8a8a); cursor: pointer; touch-action: 
         </div>
       </div>
       </div><!-- /them-sec about -->
-      <div class="ver">Mochi 字卡传讯 v8.67</div>
+      <div class="ver">Mochi 字卡传讯 v8.56</div>
       <div class="ver-credit">原版小红书@言序（1842523578）</div>
       <!-- v3.27.x：设置页底部防骗声明 -->
       <div class="set-alert">
@@ -13229,7 +13135,7 @@ font-size: 11.5px; color: var(--muted, #8a8a8a); cursor: pointer; touch-action: 
             <div class="lic-hero-top">
               <div class="lic-title">Mochi 字卡传讯</div>
               <span class="lic-badge">原版</span>
-              <span class="lic-ver">v8.67</span>
+              <span class="lic-ver">v8.56</span>
             </div>
             <div class="lic-p">原创极简风情侣字卡传讯，不是小手机：黑白灰简约设计，数据全部保存在本地、无需联网；所有内容均为代码触发、按概率运行，联系方可主动发送聊天消息。代码从零编写并完全开源——本作即原版。</div>
             <!-- v3.26.x #648：原版口径澄清——唯一原版使用网站＋其他版本均为开放二传二改产生的二传/二改版 -->
@@ -22916,4 +22822,4 @@ window.__mochiBootRetry = function () { try { location.reload(); } catch (e) {} 
 <!-- __MOCHI_EOF__ -->
 </body>
 </html>
-<!-- __MOCHI_EOF__ mvar5w5o -->
+<!-- __MOCHI_EOF__ mvordm5w -->

@@ -78,8 +78,7 @@ const IS_AUTOMATION = (typeof navigator !== 'undefined') &&
 function qaEnabled() {
 const v = gGet(K_QA_EN);
 if (v === '1') return true;
-if (v === '0') return false;
-return !IS_AUTOMATION;   // 未设置：真机默认开，无头默认关
+return false;   // 默认关闭开屏问答
 }
 function qaSetEn(v) { gSet(K_QA_EN, v ? '1' : '0'); }
 function qaSkipped() { return gGet(K_QA_SKIP) === '1'; }  // 本机已输暗号 → 永久跳过问答层

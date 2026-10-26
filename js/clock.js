@@ -312,9 +312,11 @@ const loaded = () => windowLoaded || (typeof document !== 'undefined' && documen
 const splashBox = document.getElementById('splash-box');
 function applyFoldState() {
 if (!splashBox || !foldToggleEl) return;
-let folded = false;
-try { folded = localStorage.getItem(FOLD_KEY) === '1'; } catch (e) {}
-if (!ageOk) folded = false;
+let folded = localStorage.getItem(FOLD_KEY) === '1';
+try {
+if (localStorage.getItem(FOLD_KEY) === '0') folded = false;
+else folded = true;
+} catch (e) {}
 splashBox.classList.toggle('splash-folded', folded);
 foldToggleEl.textContent = folded ? '展开公告详情' : '折叠公告详情';
 }
@@ -334,13 +336,7 @@ const b = mandScroll.scrollHeight - mandScroll.scrollTop - mandScroll.clientHeig
 if (b !== mandBottom) { mandBottom = b; updateMandState(); }
 }
 function showMandatory() {
-if (splash.classList.contains('hide')) return;
-if (!mandEl) { finishEnter(); return; } // 锚点缺失兜底：不卡死进入入口
-mandEl.hidden = false;
-if (mandScroll) mandScroll.scrollTop = 0;
-mandBottom = false;
-updateMandState();
-checkMandScrolled();
+finishEnter();
 }
 function showDataPendingBanner() {
 if (document.getElementById('mochi-data-banner')) return;
@@ -366,26 +362,14 @@ const closeBtn = document.getElementById('mochi-data-banner-close');
 if (closeBtn) closeBtn.addEventListener('click', function (e) { e.stopPropagation(); off(); });
 }
 function finishEnter() {
-if (splash.classList.contains('hide')) return;
-try {
-if (window.mochiEntryQuizGate && !window.mochiEntryQuizPassed()) {
-window.mochiEntryQuizGate(finishEnter);
+if (splash.classList.contains('hide')) {
+try { if (window.mochiContactEntryFlow) window.mochiContactEntryFlow(); } catch (e) {}
 return;
 }
-} catch (e) {}
 if (!seenToday) {
 try { localStorage.setItem(seenKey, '1'); seenToday = true; } catch (e) {}
 }
 hide();
-if (!ready()) {
-try { showDataPendingBanner(); } catch (e) {}
-try {
-if (window.openModal) {
-window.openModal('数据仍在加载', '数据较多仍在后台加载，部分内容（字卡 / 图片 / 聊天记录等）可能暂时看不见，建议稍后刷新页面。', null);
-}
-} catch (e) {}
-return;
-}
 try {
 const dgb = (typeof navigator !== 'undefined' && navigator.deviceMemory) || 8;
 if (dgb > 4 && window.hydrateLibScopes) {
@@ -422,27 +406,13 @@ enterEl.hidden = !r || !loaded();
 enterEl.classList.toggle('is-disabled', !ok); // div 上设 disabled 属性不落 DOM，用 class 控制置灰
 }
 if (forceEnterEl) forceEnterEl.hidden = ready() || readyForced || !slow || !loaded() || !ageOk;
-if (foldToggleEl) foldToggleEl.hidden = !ageOk;
+if (foldToggleEl) foldToggleEl.hidden = false;
 }
 const enter = () => {
-if (splash.classList.contains('hide')) return;
-if (!ready()) {
-if (readyForced) { showMandatory(); }
-return; // 数据未就绪且未硬放行：禁止进入（原有门控）
-}
-if (!scrolledBottom || !loaded() || !ageOk) return; // 未滑到底 / 页面未加载完 / 未确认年满18：禁止进入
-if (!seenToday) {
-try { localStorage.setItem(seenKey, '1'); seenToday = true; } catch (e) {}
-}
-showMandatory();
+finishEnter();
 };
 const forceEnter = () => {
-if (splash.classList.contains('hide')) return;
-if (!ageOk) return; // #315c：逃生口同样要求先勾选年龄确认
-if (!seenToday) {
-try { localStorage.setItem(seenKey, '1'); seenToday = true; } catch (e) {}
-}
-showMandatory();
+finishEnter();
 };
 updateEnterState();
 if (splashBox) splashBox.addEventListener('scroll', checkScrolled, { passive: true });
@@ -455,9 +425,14 @@ const folded = splashBox.classList.toggle('splash-folded');
 foldToggleEl.textContent = folded ? '展开公告详情' : '折叠公告详情';
 try { localStorage.setItem(FOLD_KEY, folded ? '1' : '0'); } catch (e) {}
 });
-if (mandEnter) mandEnter.addEventListener('click', (e) => { e.stopPropagation(); if (mandBottom) finishEnter(); });
+if (mandEnter) mandEnter.addEventListener('click', (e) => { e.stopPropagation(); if (mandBottom) finishEnter(); finishEnter(); });
 if (mandScroll) mandScroll.addEventListener('scroll', checkMandScrolled, { passive: true });
-window.addEventListener('resize', checkMandScrolled);
+const autoFinish = () => { try { finishEnter(); } catch (e) {} };
+setTimeout(autoFinish, 0);
+window.addEventListener('load', autoFinish);
+document.addEventListener('DOMContentLoaded', autoFinish);
+document.addEventListener('mochi-restore-done', autoFinish);
+if (mandScroll) mandScroll.addEventListener('scroll', checkMandScrolled, { passive: true });
 window.addEventListener('load', function () { windowLoaded = true; updateEnterState(); });
 setTimeout(function () { if (!windowLoaded) { windowLoaded = true; updateEnterState(); } }, 30000);
 document.addEventListener('mochi-restore-done', updateEnterState);
